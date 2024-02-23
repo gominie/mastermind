@@ -7,6 +7,7 @@ class Mastermind
     @guess = []
     @victory = false
     @guess_count = 0
+    @hint_arr = []
   end
 
   def create_computer_guess
@@ -21,20 +22,23 @@ class Mastermind
 
   def handle_guess
     @guess.each_with_index do |num, index|
+      @hint_arr
       if @secret_code[index] == @guess[index]
         #puts "color and position match for #{num} at #{index}"
-        puts "●"
+        #puts "●"
+        @hint_arr << "●"
       elsif @secret_code.include?(num)
         #puts "found a match for #{num} at a different position"
-        puts "○"
-      else
-        puts 'No match'
+        #puts "○"
+        @hint_arr << "○"
       end
     end
+    p @hint_arr.shuffle
   end
 
   #save handle guess reply into array so I can add "hint"
   #before it
+  #shuffle array
 
   def start_game
     @secret_code = [1, 2, 3, 4]
