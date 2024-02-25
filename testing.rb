@@ -17,56 +17,48 @@ class Mastermind
   def victory?
     if @guess == @secret_code
       @victory = true
+      p "You have won!"
     end
   end
 
   def handle_guess
+    hint_arr = []
     @guess.each_with_index do |num, index|
-      @hint_arr
       if @secret_code[index] == @guess[index]
-        #puts "color and position match for #{num} at #{index}"
-        #puts "●"
         @hint_arr << "●"
       elsif @secret_code.include?(num)
-        #puts "found a match for #{num} at a different position"
-        #puts "○"
         @hint_arr << "○"
       end
     end
-    p @hint_arr.shuffle
+    @hint_arr.shuffle!
+    p "hint: #{@hint_arr.join(" ")}"
+    @hint_arr = []
   end
 
-  #save handle guess reply into array so I can add "hint"
-  #before it
-  #shuffle array
 
   def start_game
     @secret_code = [1, 2, 3, 4]
+    puts "Welcome to terminal mastermind!"
     while (!@victory && @guess_count <= 6)
       result = !@victory || @guess_count <= 6
-      p result
-      @guess = gets.chomp.split.map(&:to_i)
-      @guess_count += 1
-      victory?
+      @guess = gets.chomp.to_i.digits.reverse
+      p @guess.length
+      next unless @guess.length == 4
+      break if victory?
       handle_guess
-      p "value of victory: #{@victory}"
+      @guess_count += 1
+      p " Guess Count: #{@guess_count}"
+      if @guess_count == 6 && !victory?
+        p "No win"
     end
-    p "you have won"
+    end
   end
 end
+
+#only allow 4 guesses
 
 game = Mastermind.new
 game.start_game
 
-# #workks to iterate through player guess
-# my_guess.each_with_index do |num,index|
-#   if secret_code[index] == my_guess[index]
-#     puts "color and position match for #{num} at #{index}"
-#   elsif secret_code.include?(num)
-#     puts "found a match for #{num} at a different position"
-#   else
-#     puts "No match"
-#    end
-# end
-#
-# allowed to input and run code 6 times
+#added no victory case
+#wat happens i correct on 6th guess
