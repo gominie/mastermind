@@ -1,9 +1,4 @@
-# idea only replace nil values with random after iterating thru values to find match
-# how to target the indexes that match??
-# arr_with-index/
-
 class Mastermind
-  attr_reader :gen_code
 
   def initialize
     @secret_code = []
@@ -24,17 +19,25 @@ class Mastermind
     empty_arr = Array.new(4)
     puts "empty arr value before code is #{empty_arr}"
     @guess.each_with_index do |num, index|
+      #keep correct guess in same position
       if @guess[index] == @secret_code[index]
         empty_arr[index] = @secret_code[index]
       elsif @secret_code.include?(num)
+        #nil values in arr that arent perfect matches
         empty_indexes = empty_arr.each_index.select { |i| empty_arr[i].nil? }
+        #get random nil index so only 1 value changed at a time
         random_empty_index = empty_indexes.sample
+
+        new_num = (0..6).to_a.sample
+        while @guess.include?(new_num)
+          new_num = (0..6).to_a.sample
+        end
         empty_arr[random_empty_index] = num
       end
     end
+    #any remaining nil values are replaced with random number
     empty_arr.map! {|value| value.nil? ? (0..6).to_a.sample : value}
     @guess = empty_arr
-    puts "guess value after computer guess method is #{@guess}"
   end
 
 
@@ -52,31 +55,30 @@ class Mastermind
       puts "What's the code? #{6 - @guess_count} guesses remaining"
       @guess = gets.chomp.to_i.digits.reverse
       next unless @guess.length == 4 && @guess.all? { |num| (0..6).include?(num) }
-
       @guess_count += 1
       break if victory?
-
-      # puts "Guess Count: #{@guess_count}"
       handle_guess if @guess_count < 6
       puts 'Out of guesses' if @guess_count == 6 && !victory?
     end
   end
 
   def code_maker
-    puts 'Please input code'
-    create_secret_code
-    @secret_code = gets.chomp.to_i.digits.reverse
+    puts 'Please input your secret code of 4 digits using numbers 0-6'
+    until @secret_code.length == 4 && @secret_code.all? { |num| (0..6).include?(num) }
+      @secret_code = gets.chomp.to_i.digits.reverse
+  end
     p "secret code is: #{@secret_code}"
     while !@victory && @guess_count < 6
       if @guess_count == 0
         @guess = (0..6).to_a.shuffle.take(4)
-        puts "guess is!!: #{@guess}"
+        puts "computer guesses: #{@guess}"
         victory?
+        sleep(2)
         handle_guess
         @guess_count += 1
       end
       create_computer_guess
-      p "secret code is: #{@secret_code}"
+      sleep (2)
       p "guess is: #{@guess}"
       @guess_count += 1
       break if victory?
@@ -87,7 +89,8 @@ class Mastermind
   end
 
   def handle_guess
-    hint_arr = []
+    @hint_arr = []
+
     @guess.each_with_index do |num, index|
       if @secret_code[index] == @guess[index]
         @hint_arr << '●'
@@ -97,7 +100,7 @@ class Mastermind
     end
     @hint_arr.shuffle!
     p "hint: #{@hint_arr.join(' ')}"
-    @hint_arr = []
+    #@hint_arr = []
   end
 
   def start_game
